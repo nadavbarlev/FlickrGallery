@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_clear_search"
+        android:orderInCategory="100"
+        android:title="@string/menu_clear_search" />
+
+    <item
+        android:id="@+id/action_toggle_polling"
+        android:title="@string/menu_start_polling"
+        android:orderInCategory="200" />
+
+</menu>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v7.widget.Toolbar
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:id="@+id/toolbarMain"
+    android:background="@drawable/grey_border_bottom">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewTitle"
+            android:layout_centerVertical="true"
+            android:text="@string/main_title"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <EditText
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/editTextSearch"
+            android:background="@null"
+            android:textSize="16sp"
+            android:hint="Search"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/textViewTitle"
+            android:layout_toLeftOf="@+id/imageViewSearch"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"/>
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/imageViewSearch"
+            android:src="@drawable/ic_search"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:padding="10dp"/>
+
+    </RelativeLayout>
+
+</android.support.v7.widget.Toolbar>

@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">FlickrGallery</string>
+    <string name="main_title">FlickrGallery | </string>
+    <string name="menu_clear_search">Clear Search</string>
+    <string name="menu_start_polling">Start Polling</string>
+    <string name="menu_stop_polling">Stop Polling</string>
+    <string name="notification_new_photo_title">New Flickr Picture</string>
+    <string name="notification_new_photo_content">You have new picture in Flickr client</string>
+</resources>
