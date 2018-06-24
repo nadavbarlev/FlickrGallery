@@ -5,7 +5,12 @@ package com.nadavbarlev.flickrgallery.Model;
  *  Author - Nadav Bar Lev
  *  Represent a Photo
  */
+
 public class GalleryItem {
+
+    // Constants
+    final static String PHOTOS_ENDPOINT = "https://www.flickr.com/photos/";
+    final static String BACKSLASH       = "/";
 
     // Data Members
     private String mCaption;
@@ -40,7 +45,7 @@ public class GalleryItem {
 
     // Methods
     public String getPhotoPageUrl() {
-        return "https://www.flickr.com/photos/" + getOwner() + "/" + getId();
+        return PHOTOS_ENDPOINT + getOwner() + BACKSLASH + getId();
     }
 
     public String toString() {

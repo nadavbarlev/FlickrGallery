@@ -67,6 +67,7 @@ public class GalleryItemAdapter extends ArrayAdapter<GalleryItem> {
             }
         });
 
+        // Set Data
         UniversalImageLoader.setImage(currGalleryItem.getUrl(),
                                       imageView,
                                       progressBar, "");

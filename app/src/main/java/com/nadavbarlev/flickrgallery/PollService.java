@@ -50,7 +50,7 @@ public class PollService extends IntentService {
         // Get the ID of the first item
         String resultId = items.get(0).getId();
 
-        // There is a new photo
+        // There is a new photo to display
         if (!resultId.equals(lastResultID)) {
 
             Intent intentMain = new Intent(this, MainActivity.class);

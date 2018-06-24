@@ -29,11 +29,14 @@ public class UniversalImageLoader {
     // Data Members
     private Context mContext;
 
+    // Constructor
     public UniversalImageLoader(Context context) {
         mContext = context;
     }
 
+    // Configure ImageLoader
     public ImageLoaderConfiguration getConfig(){
+
         DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
                 .showImageOnLoading(defaultImage)
                 .showImageForEmptyUri(defaultImage)
@@ -51,10 +54,13 @@ public class UniversalImageLoader {
         return configuration;
     }
 
+    // Set Image to component
     public static void setImage(String imgURL, ImageView image, final ProgressBar mProgressBar, String append){
 
         ImageLoader imageLoader = ImageLoader.getInstance();
+
         imageLoader.displayImage(append + imgURL, image, new ImageLoadingListener() {
+
             public void onLoadingStarted(String imageUri, View view) {
                 if(mProgressBar != null){
                     mProgressBar.setVisibility(View.VISIBLE);

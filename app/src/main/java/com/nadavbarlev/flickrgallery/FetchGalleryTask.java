@@ -3,7 +3,6 @@ package com.nadavbarlev.flickrgallery;
 import android.os.AsyncTask;
 import com.nadavbarlev.flickrgallery.Model.GalleryItem;
 import com.nadavbarlev.flickrgallery.Utils.SharedPreferencesHelper;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
@@ -42,7 +41,7 @@ public class FetchGalleryTask extends AsyncTask<Integer, Void, ArrayList<Gallery
 
             SharedPreferencesHelper.save(Flickr.PREF_SHOULD_CLEAR, false);
 
-            // Retrieve new data (params[0] should be the first page)
+            // Retrieve new data (first page)
             return new Flickr().fetch(String.valueOf(params[0]));
         }
 
@@ -78,6 +77,6 @@ public class FetchGalleryTask extends AsyncTask<Integer, Void, ArrayList<Gallery
     }
 
     public interface OnCompleteListener {
-        void getGalleryItems(ArrayList<GalleryItem> galleryItems, boolean isSearched);
+        void getGalleryItems(ArrayList<GalleryItem> galleryItems, boolean isSearchedOrCleared);
     }
 }

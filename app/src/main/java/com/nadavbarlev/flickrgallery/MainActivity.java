@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements FetchGalleryTask.
     // Data Members
     private GalleryItemAdapter     mGalleryItemAdapter;
     private ArrayList<GalleryItem> mGalleryItems;
-    private int                    mRecentPage;
+    private int                    mNextPageToLoad;
     private boolean                mIsUserScrolled;
 
     // Controls
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements FetchGalleryTask.
 
         // Data Members
         mGalleryItems   = new ArrayList<GalleryItem>();
-        mRecentPage     = 1;
+        mNextPageToLoad = 1;
         mIsUserScrolled = false;
 
         // Controls
@@ -60,8 +60,9 @@ public class MainActivity extends AppCompatActivity implements FetchGalleryTask.
             public void onClick(View v) {
 
                 // Init recent page
-                mRecentPage = 1;
+                mNextPageToLoad = 1;
 
+                // If search box is not empty
                 if (!mEditTextSearch.getText().toString().equals("")) {
 
                     // Stop the previous Polling
@@ -74,13 +75,13 @@ public class MainActivity extends AppCompatActivity implements FetchGalleryTask.
                     // Enable Clear Search
                     mMenuItemClear.setEnabled(true);
 
-                    // Save the query for the Flickr search
+                    // Save the search query for the Flickr-Search
                     SharedPreferencesHelper.save(Flickr.PREF_SEARCH_QUERY, mEditTextSearch.getText().toString());
 
                     // Turn On ActiveSearch flag
                     SharedPreferencesHelper.save(Flickr.PREF_IS_SEARCH_ACTIVE, true);
 
-                    new FetchGalleryTask(MainActivity.this).execute(mRecentPage);
+                    new FetchGalleryTask(MainActivity.this).execute(mNextPageToLoad);
                 }
             }
         });
@@ -90,10 +91,11 @@ public class MainActivity extends AppCompatActivity implements FetchGalleryTask.
 
            @Override
            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
                if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
                    mIsUserScrolled = false;
                } else if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_FLING ||
-                       scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                        scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
                    mIsUserScrolled = true;
                }
            }
@@ -102,23 +104,25 @@ public class MainActivity extends AppCompatActivity implements FetchGalleryTask.
            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
                // If SearchActive flag off and the user scrolled to the bottom
-               if (!SharedPreferencesHelper.loadBoolean(Flickr.PREF_IS_SEARCH_ACTIVE) &&
-                   mIsUserScrolled &&
-                   firstVisibleItem + visibleItemCount >= totalItemCount) {
+               if (mIsUserScrolled &&
+                   firstVisibleItem + visibleItemCount >= totalItemCount &&
+                   !SharedPreferencesHelper.loadBoolean(Flickr.PREF_IS_SEARCH_ACTIVE)) {
 
-                   new FetchGalleryTask(MainActivity.this).execute(mRecentPage);
-                   
+                   // Get the next page
+                   new FetchGalleryTask(MainActivity.this).execute(mNextPageToLoad);
+
+                   // Turn of flag
                    mIsUserScrolled = false;
                }
            }
        });
 
 
-        // Setup Toolbar
+        // Load the previous search query
         mEditTextSearch.setText(SharedPreferencesHelper.loadString(Flickr.PREF_SEARCH_QUERY));
 
         // setup Gallery
-        new FetchGalleryTask(MainActivity.this).execute(mRecentPage);
+        new FetchGalleryTask(MainActivity.this).execute(mNextPageToLoad);
 
         // Define toolbar as the ActionBar
         setSupportActionBar(mToolbar);
@@ -126,8 +130,6 @@ public class MainActivity extends AppCompatActivity implements FetchGalleryTask.
 
 
     public boolean onCreateOptionsMenu(Menu menu) {
-
-        Log.d(TAG, "onCreateOptionsMenu: Started");
 
         // Inflate menu
         getMenuInflater().inflate(R.menu.menu_toolbar, menu);
@@ -150,9 +152,12 @@ public class MainActivity extends AppCompatActivity implements FetchGalleryTask.
 
             // Search active and polling started
             if (PollService.isServiceAlarmOn()) {
+
                 mMenuItemPolling.setTitle(R.string.menu_stop_polling);
                 PollService.setServiceAlarm(this, true);
+
             } else {
+
                 mMenuItemPolling.setTitle(R.string.menu_start_polling);
                 PollService.setServiceAlarm(this, false);
 
@@ -164,56 +169,18 @@ public class MainActivity extends AppCompatActivity implements FetchGalleryTask.
 
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        Log.d(TAG, "onOptionsItemSelected: Started");
-
         switch (item.getItemId())  {
 
             case (R.id.action_clear_search):
 
-                mRecentPage = 1;
-
-                // Clear Search history
-                SharedPreferencesHelper.save(Flickr.PREF_SEARCH_QUERY, "");
-
-                // Turn Off SearchActive flag
-                SharedPreferencesHelper.save(Flickr.PREF_IS_SEARCH_ACTIVE, false);
-
-                // Turn On ClearAction flag
-                SharedPreferencesHelper.save(Flickr.PREF_SHOULD_CLEAR, true);
-
-                // Clear editText Search
-                mEditTextSearch.setText("");
-
-                // Get new Gallery items
-                new FetchGalleryTask(MainActivity.this).execute(mRecentPage);
-
-                // Disable Polling and change item to "Start Polling" for next search action
-                mMenuItemPolling.setTitle(R.string.menu_start_polling);
-                mMenuItemPolling.setEnabled(false);
-
-                // Disable Clear Search
-                mMenuItemClear.setEnabled(false);
+                menuSearchAction();
 
                 return (true);
 
             case (R.id.action_toggle_polling):
 
-                // Polling already active
-                if (PollService.isServiceAlarmOn()) {
+               menuTogglePollingAction(item);
 
-                    // Turn Off Polling
-                    PollService.setServiceAlarm(this, false);
-
-                    // Item title - Start Polling
-                    item.setTitle(R.string.menu_start_polling);
-                } else {
-
-                    // Turn On Polling
-                    PollService.setServiceAlarm(this, true);
-
-                    // Item title - Stop Polling
-                    item.setTitle(R.string.menu_stop_polling);
-                }
                 return (true);
 
             default:
@@ -221,6 +188,11 @@ public class MainActivity extends AppCompatActivity implements FetchGalleryTask.
         }
     }
 
+    /*
+     * This function is a Callback for FetchGalleryTask.
+     * Gets the new GalleryItems, set them to the GridView and scroll to the correct position.
+     * This is the only place to handle mNextPageToLoad
+     */
     @Override
     public void getGalleryItems(ArrayList<GalleryItem> galleryItems, boolean isSearchedOrCleared) {
 
@@ -231,10 +203,10 @@ public class MainActivity extends AppCompatActivity implements FetchGalleryTask.
             mGalleryItems.addAll(galleryItems);
 
             // Next page to retrieve
-            mRecentPage++;
+            mNextPageToLoad++;
 
             // Scroll to the correct position
-            mGridViewGallery.setSelection((mRecentPage - 2) * 100);
+            mGridViewGallery.setSelection((mNextPageToLoad - 2) * 100);
         }
         else {
 
@@ -243,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements FetchGalleryTask.
             mGalleryItems.addAll(galleryItems);
 
             // Scroll to the correct position
-            mGridViewGallery.setSelection((mRecentPage - 1) * 100 + 1);
+            mGridViewGallery.setSelection((mNextPageToLoad - 1) * 100 + 1);
         }
 
          if (mGalleryItemAdapter == null) {
@@ -258,5 +230,53 @@ public class MainActivity extends AppCompatActivity implements FetchGalleryTask.
 
              mGalleryItemAdapter.notifyDataSetChanged();
          }
+    }
+
+    private void menuSearchAction() {
+
+        mNextPageToLoad = 1;
+
+        // Clear previous Search query
+        SharedPreferencesHelper.save(Flickr.PREF_SEARCH_QUERY, "");
+
+        // Turn Off SearchActive flag
+        SharedPreferencesHelper.save(Flickr.PREF_IS_SEARCH_ACTIVE, false);
+
+        // Turn On ClearAction flag
+        SharedPreferencesHelper.save(Flickr.PREF_SHOULD_CLEAR, true);
+
+        // Clear editText Search
+        mEditTextSearch.setText("");
+
+        // Get new Gallery items
+        new FetchGalleryTask(MainActivity.this).execute(mNextPageToLoad);
+
+        // Disable Polling and change item to "Start Polling" for next search action
+        mMenuItemPolling.setTitle(R.string.menu_start_polling);
+        mMenuItemPolling.setEnabled(false);
+
+        // Disable Clear Search
+        mMenuItemClear.setEnabled(false);
+    }
+
+    private void menuTogglePollingAction(MenuItem item) {
+
+        // Polling already active
+        if (PollService.isServiceAlarmOn()) {
+
+            // Turn Off Polling
+            PollService.setServiceAlarm(this, false);
+
+            // Item title - Start Polling
+            item.setTitle(R.string.menu_start_polling);
+
+        } else {
+
+            // Turn On Polling
+            PollService.setServiceAlarm(this, true);
+
+            // Item title - Stop Polling
+            item.setTitle(R.string.menu_stop_polling);
+        }
     }
 }
