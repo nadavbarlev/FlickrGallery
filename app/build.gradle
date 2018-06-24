@@ -33,4 +33,7 @@ dependencies {
 
     /* Universal ImageLoader */
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
+
+    // Robolectric
+    testImplementation "org.robolectric:robolectric:3.8"
 }

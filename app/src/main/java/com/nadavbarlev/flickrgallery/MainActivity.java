@@ -179,11 +179,12 @@ public class MainActivity extends AppCompatActivity implements FetchGalleryTask.
 
             case (R.id.action_toggle_polling):
 
-               menuTogglePollingAction(item);
+                menuTogglePollingAction(item);
 
                 return (true);
 
             default:
+
                 return super.onOptionsItemSelected(item);
         }
     }
