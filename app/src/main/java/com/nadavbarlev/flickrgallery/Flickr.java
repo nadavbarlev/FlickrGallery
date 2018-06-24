@@ -73,7 +73,7 @@ public class Flickr {
     /* Read the URL data and Return it as an ArrayList */
     public ArrayList<GalleryItem> getGallery(String url) {
 
-        ArrayList<GalleryItem> galleryItems = null;
+        ArrayList<GalleryItem> galleryItems = new ArrayList<GalleryItem>();;
 
         try {
 
@@ -82,8 +82,6 @@ public class Flickr {
 
             if (xmlString == null)
                 return null;
-
-            galleryItems = new ArrayList<GalleryItem>();
 
             // Create a Xml Parser
             XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();

@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.util.Log;
+
 import com.nadavbarlev.flickrgallery.Model.GalleryItem;
 import com.nadavbarlev.flickrgallery.Utils.MyApp;
 import com.nadavbarlev.flickrgallery.Utils.SharedPreferencesHelper;
@@ -27,7 +29,7 @@ public class PollService extends IntentService {
 
     // Constants
     public static final String PREF_IS_ALARM_ON = "isAlarmOn";
-    public static final int    POLL_INTERVAL    = 1000 * 60 * 15; // 15 Min
+    public static final int    POLL_INTERVAL    = 1000 * 60 * 1; // 15 Min
 
     // Constructor
     public PollService() {
@@ -38,6 +40,8 @@ public class PollService extends IntentService {
     }
 
     protected void onHandleIntent(Intent intent) {
+
+        Log.d(TAG, "onHandleIntent: Started");
 
         String searchQuery  = SharedPreferencesHelper.loadString(Flickr.PREF_SEARCH_QUERY);
         String lastResultID = SharedPreferencesHelper.loadString(Flickr.PREF_LAST_RESULT_ID);

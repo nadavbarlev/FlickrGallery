@@ -90,12 +90,16 @@ public class FlickrTest {
     @Test
     public void getGallery_illegalURL() {
 
-        String URL = "";
+        String URL            = "";
+        int    outputExpected = 0;
+        int    outputReceived;
 
         ArrayList<GalleryItem> galleryItems =
                 new Flickr().getGallery(URL);
 
-        assertNull(galleryItems);
+        outputReceived = galleryItems.size();
+
+        assertEquals(outputExpected, outputReceived);
 
     }
 }
